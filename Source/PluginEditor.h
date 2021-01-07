@@ -25,6 +25,16 @@ public:
     void resized() override;
 
 private:
+    
+    juce::Slider mDryWetSlider;
+    juce::Slider mFeedbackSlider;
+    juce::Slider mDelayTimeSlider;
+    
+    juce::Label mDryWetLabel;
+    juce::Label mFeedbackLabel;
+    
+
+    
     // This reference is provided as a quick way for your editor to
     // access the processor object that created it.
     DelayPlugInAudioProcessor& audioProcessor;

@@ -10,7 +10,7 @@
 
 #include <JuceHeader.h>
 
-#define MAX_DELAY_TIME 2;
+#define MAX_DELAY_TIME 2
 
 //==============================================================================
 /**
@@ -57,13 +57,21 @@ public:
 
 private:
     
-    int mCircularBufferWriteHead;
+    juce::AudioParameterFloat* mDryWetParameter;
+    juce::AudioParameterFloat* mFeedbackParameter;
+    juce::AudioParameterFloat* mDelayTimeParameter;
+    
+    float mFeedbackLeft;
+    float mFeedbackRight;
+    
+    float mDelayTimeInSamples;
+    float mDelayReadHead; //reads audio samples from circular buffer
+    
+    int mCircularBufferWriteHead; //writes audio samples to circular buffer
     int mCircularBufferLength;
     
     float* mCircularBufferLeft;
     float* mCircularBufferRight;
-    float mDelayTimeInSamples;
-    float mDelayReadHead;
     
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (DelayPlugInAudioProcessor)
