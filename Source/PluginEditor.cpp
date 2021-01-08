@@ -26,7 +26,7 @@ DelayPlugInAudioProcessorEditor::DelayPlugInAudioProcessorEditor (DelayPlugInAud
     mDryWetSlider.setBounds(100, 0, 200, 100);
     mDryWetSlider.setSliderStyle(juce::Slider::SliderStyle::RotaryVerticalDrag);
     mDryWetSlider.setTextBoxStyle(juce::Slider::TextEntryBoxPosition::NoTextBox, true, 0, 0);
-    mDryWetSlider.setColour(juce::Slider::thumbColourId, juce::Colours::salmon);
+    mDryWetSlider.setColour(juce::Slider::thumbColourId, juce::Colour(219,254,25));
     mDryWetSlider.setValue(*dryWetParameter);
     mDryWetSlider.setRange(dryWetParameter->range.start, dryWetParameter->range.end);
     addAndMakeVisible(mDryWetSlider);
@@ -49,6 +49,7 @@ DelayPlugInAudioProcessorEditor::DelayPlugInAudioProcessorEditor (DelayPlugInAud
     addAndMakeVisible(mDryWetLabel);
     mDryWetLabel.setText("Dry/Wet", juce::dontSendNotification);
     mDryWetLabel.attachToComponent(&mDryWetSlider, true);
+    mDryWetLabel.setColour(juce::Label::textColourId, juce::Colour(219,254,25));
     
     //==============================================================================
     
@@ -59,7 +60,7 @@ DelayPlugInAudioProcessorEditor::DelayPlugInAudioProcessorEditor (DelayPlugInAud
     mFeedbackSlider.setBounds(100, 100, 200, 100);
     mFeedbackSlider.setSliderStyle(juce::Slider::SliderStyle::RotaryVerticalDrag);
     mFeedbackSlider.setTextBoxStyle(juce::Slider::TextEntryBoxPosition::NoTextBox, true, 0, 0);
-    mFeedbackSlider.setColour(juce::Slider::thumbColourId, juce::Colours::seagreen);
+    mFeedbackSlider.setColour(juce::Slider::thumbColourId, juce::Colour(219,254,25));
     mFeedbackSlider.setRange(feedbackParameter->range.start, feedbackParameter->range.end);
     mFeedbackSlider.setValue(*feedbackParameter);
     addAndMakeVisible(mFeedbackSlider);
@@ -82,6 +83,7 @@ DelayPlugInAudioProcessorEditor::DelayPlugInAudioProcessorEditor (DelayPlugInAud
     addAndMakeVisible(mFeedbackLabel);
     mFeedbackLabel.setText("Feedback", juce::dontSendNotification);
     mFeedbackLabel.attachToComponent(&mFeedbackSlider, true);
+    mFeedbackLabel.setColour(juce::Label::textColourId, juce::Colour(219,254,25));
     
     //==============================================================================
     
@@ -92,7 +94,7 @@ DelayPlugInAudioProcessorEditor::DelayPlugInAudioProcessorEditor (DelayPlugInAud
     mDelayTimeSlider.setBounds(100, 200, 200, 100);
     mDelayTimeSlider.setSliderStyle(juce::Slider::SliderStyle::RotaryVerticalDrag);
     mDelayTimeSlider.setTextBoxStyle(juce::Slider::TextEntryBoxPosition::NoTextBox, true, 0, 0);
-    mDelayTimeSlider.setColour(juce::Slider::thumbColourId, juce::Colours::powderblue);
+    mDelayTimeSlider.setColour(juce::Slider::thumbColourId, juce::Colour(219,254,25));
     mDelayTimeSlider.setRange(delayTimeParameter->range.start, delayTimeParameter->range.end);
     mDelayTimeSlider.setValue(*delayTimeParameter);
     addAndMakeVisible(mDelayTimeSlider);
@@ -115,6 +117,8 @@ DelayPlugInAudioProcessorEditor::DelayPlugInAudioProcessorEditor (DelayPlugInAud
     addAndMakeVisible(mDelayTimeLabel);
     mDelayTimeLabel.setText("Delay Time", juce::dontSendNotification);
     mDelayTimeLabel.attachToComponent(&mDelayTimeSlider, true);
+    mDelayTimeLabel.setColour(juce::Label::textColourId, juce::Colour(219,254,25));
+    
     
 }
 
@@ -126,8 +130,7 @@ DelayPlugInAudioProcessorEditor::~DelayPlugInAudioProcessorEditor()
 void DelayPlugInAudioProcessorEditor::paint (juce::Graphics& g)
 {
     // (Our component is opaque, so we must completely fill the background with a solid colour)
-    g.fillAll (juce::Colours::thistle);
-
+    g.fillAll (juce::Colours::darkslategrey);
     g.setColour (juce::Colours::white);
     g.setFont (15.0f);
     g.drawFittedText ("", getLocalBounds(), juce::Justification::centred, 1);
