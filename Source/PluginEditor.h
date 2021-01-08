@@ -32,7 +32,7 @@ private:
     
     juce::Label mDryWetLabel;
     juce::Label mFeedbackLabel;
-    
+    juce::Label mDelayTimeLabel;
 
     
     // This reference is provided as a quick way for your editor to

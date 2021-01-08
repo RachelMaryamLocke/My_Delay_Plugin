@@ -29,8 +29,8 @@ DelayPlugInAudioProcessor::DelayPlugInAudioProcessor()
     
     addParameter(mDelayTimeParameter = new juce::AudioParameterFloat("delayTime", "Delay Time", 0.1f, MAX_DELAY_TIME, 0.5f));
     
-    mCircularBufferLeft = nullptr;
-    mCircularBufferRight = nullptr;
+    mCircularBufferLeft = {};
+    mCircularBufferRight = {};
     mCircularBufferWriteHead = 0;
     mDelayReadHead = 0;
     mCircularBufferLength = 0;
@@ -43,14 +43,14 @@ DelayPlugInAudioProcessor::DelayPlugInAudioProcessor()
 
 DelayPlugInAudioProcessor::~DelayPlugInAudioProcessor()
 {
-    if(mCircularBufferLeft != nullptr){
-        delete [] mCircularBufferLeft; //frees memory on the heap for 88200 floats
-        mCircularBufferLeft = nullptr; //reverts to nullptr
-    }
-    if(mCircularBufferRight != nullptr){
-        delete [] mCircularBufferRight; //frees memory on the heap for 88200 floats
-        mCircularBufferRight = nullptr; //reverts to nullptr
-    }
+//    if(mCircularBufferLeft != nullptr){
+//        delete [] mCircularBufferLeft; //frees memory on the heap for 88200 floats
+//        mCircularBufferLeft = nullptr; //reverts to nullptr
+//    }
+//    if(mCircularBufferRight != nullptr){
+//        delete [] mCircularBufferRight; //frees memory on the heap for 88200 floats
+//        mCircularBufferRight = nullptr; //reverts to nullptr
+//    }
 }
 
 //==============================================================================
@@ -122,13 +122,16 @@ void DelayPlugInAudioProcessor::prepareToPlay (double sampleRate, int samplesPer
     
     mCircularBufferLength = sampleRate * MAX_DELAY_TIME;
     
-    if(mCircularBufferLeft == nullptr){
-        mCircularBufferLeft = new float[mCircularBufferLength]; //allocates memory on the heap for 88200 floats
-    }
-
-    if(mCircularBufferRight == nullptr){
-        mCircularBufferRight = new float[mCircularBufferLength]; //allocates memory on the heap for 88200 floats
-    }
+//    if(mCircularBufferLeft == nullptr){
+//        mCircularBufferLeft = new float[mCircularBufferLength]; //allocates memory on the heap for 88200 floats
+//    }
+//
+//    if(mCircularBufferRight == nullptr){
+//        mCircularBufferRight = new float[mCircularBufferLength]; //allocates memory on the heap for 88200 floats
+//    }
+    
+    mCircularBufferLeft.resize(mCircularBufferLength);
+    mCircularBufferRight.resize(mCircularBufferLength);
 
     mCircularBufferWriteHead = 0;
     
@@ -193,11 +196,13 @@ void DelayPlugInAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, 
     float* leftChannel = buffer.getWritePointer(0); //Returns a writeable pointer to the buffer's left channel
     float* rightChannel = buffer.getWritePointer(1); //Returns a writeable pointer to the buffer's right channel
     
+    auto samples = buffer.getNumSamples();
+    
     //loops through the samples in the buffer
-    for(int i = 0; i < buffer.getNumSamples(); i++){
+    for(int i = 0; i < samples; i++){
         
-        mCircularBufferLeft[mCircularBufferWriteHead] = leftChannel[i] + mFeedbackLeft; //initialises allocated memory on the heap indexed by position of the write head
-        mCircularBufferRight[mCircularBufferWriteHead] = rightChannel[i] + mFeedbackRight; //initialises allocated memory on the heap indexed by position of the write head
+        mCircularBufferLeft.at(mCircularBufferWriteHead) = leftChannel[i] + mFeedbackLeft;
+        mCircularBufferRight.at(mCircularBufferWriteHead) = rightChannel[i] + mFeedbackRight;
 
         mDelayReadHead = mCircularBufferWriteHead - mDelayTimeInSamples;
 
@@ -211,8 +216,8 @@ void DelayPlugInAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, 
         mFeedbackLeft = delaySampleLeft * *mFeedbackParameter;
         mFeedbackRight = delaySampleRight * *mFeedbackParameter;
         
-//        mCircularBufferWriteHead++; //I THINK THIS IS WHAT IS CAUSING THE PROBLEM!
-
+        mCircularBufferWriteHead++;
+        
         buffer.setSample(0, i, buffer.getSample(0, i) * (1 - *mDryWetParameter) + delaySampleLeft * *mDryWetParameter);
         buffer.setSample(1, i, buffer.getSample(1, i) * (1 - *mDryWetParameter) + delaySampleRight * *mDryWetParameter);
 

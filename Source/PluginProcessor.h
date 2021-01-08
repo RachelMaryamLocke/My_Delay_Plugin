@@ -9,6 +9,7 @@
 #pragma once
 
 #include <JuceHeader.h>
+#include <vector>
 
 #define MAX_DELAY_TIME 2
 
@@ -70,8 +71,8 @@ private:
     int mCircularBufferWriteHead; //writes audio samples to circular buffer
     int mCircularBufferLength;
     
-    float* mCircularBufferLeft;
-    float* mCircularBufferRight;
+    std::vector<float> mCircularBufferLeft;
+    std::vector<float> mCircularBufferRight;
     
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (DelayPlugInAudioProcessor)
