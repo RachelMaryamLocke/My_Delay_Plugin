@@ -119,7 +119,6 @@ DelayPlugInAudioProcessorEditor::DelayPlugInAudioProcessorEditor (DelayPlugInAud
     mDelayTimeLabel.attachToComponent(&mDelayTimeSlider, true);
     mDelayTimeLabel.setColour(juce::Label::textColourId, juce::Colour(219,254,25));
     
-    
 }
 
 DelayPlugInAudioProcessorEditor::~DelayPlugInAudioProcessorEditor()

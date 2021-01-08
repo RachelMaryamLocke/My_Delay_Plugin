@@ -29,6 +29,7 @@ DelayPlugInAudioProcessor::DelayPlugInAudioProcessor()
     
     addParameter(mDelayTimeParameter = new juce::AudioParameterFloat("delayTime", "Delay Time", 0.1f, MAX_DELAY_TIME, 0.1f));
         
+    mDelayTimeSmoothed = 0;
     mCircularBufferWriteHead = 0;
     mDelayReadHead = 0;
     mCircularBufferLength = 0;
@@ -41,14 +42,6 @@ DelayPlugInAudioProcessor::DelayPlugInAudioProcessor()
 
 DelayPlugInAudioProcessor::~DelayPlugInAudioProcessor()
 {
-//    if(mCircularBufferLeft != nullptr){
-//        delete [] mCircularBufferLeft; //frees memory on the heap for 88200 floats
-//        mCircularBufferLeft = nullptr; //reverts to nullptr
-//    }
-//    if(mCircularBufferRight != nullptr){
-//        delete [] mCircularBufferRight; //frees memory on the heap for 88200 floats
-//        mCircularBufferRight = nullptr; //reverts to nullptr
-//    }
 }
 
 //==============================================================================
@@ -120,18 +113,12 @@ void DelayPlugInAudioProcessor::prepareToPlay (double sampleRate, int samplesPer
     
     mCircularBufferLength = sampleRate * MAX_DELAY_TIME;
     
-//    if(mCircularBufferLeft == nullptr){
-//        mCircularBufferLeft = new float[mCircularBufferLength]; //allocates memory on the heap for 88200 floats
-//    }
-//
-//    if(mCircularBufferRight == nullptr){
-//        mCircularBufferRight = new float[mCircularBufferLength]; //allocates memory on the heap for 88200 floats
-//    }
-    
     mCircularBufferLeft.resize(mCircularBufferLength);
     mCircularBufferRight.resize(mCircularBufferLength);
 
     mCircularBufferWriteHead = 0;
+    
+    mDelayTimeSmoothed = *mDelayTimeParameter;
     
     // Use this method as the place to do any pre-playback
     // initialisation that you need..
@@ -182,15 +169,6 @@ void DelayPlugInAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, 
     for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
         buffer.clear (i, 0, buffer.getNumSamples());
     
-    mDelayTimeInSamples = getSampleRate() * *mDelayTimeParameter;
-
-    // This is the place where you'd normally do the guts of your plugin's
-    // audio processing...
-    // Make sure to reset the state if your inner loop is processing
-    // the samples and the outer loop is handling the channels.
-    // Alternatively, you can process the samples with the channels
-    // interleaved by keeping the same state.
-    
     float* leftChannel = buffer.getWritePointer(0); //Returns a writeable pointer to the buffer's left channel
     float* rightChannel = buffer.getWritePointer(1); //Returns a writeable pointer to the buffer's right channel
     
@@ -198,6 +176,9 @@ void DelayPlugInAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, 
     
     //loops through the samples in the buffer
     for(int i = 0; i < samples; i++){
+        
+        mDelayTimeSmoothed = mDelayTimeSmoothed - 0.001 * (mDelayTimeSmoothed - *mDelayTimeParameter);
+        mDelayTimeInSamples = getSampleRate() * mDelayTimeSmoothed;
         
         mCircularBufferLeft.at(mCircularBufferWriteHead) = leftChannel[i] + mFeedbackLeft;
         mCircularBufferRight.at(mCircularBufferWriteHead) = rightChannel[i] + mFeedbackRight;
@@ -208,16 +189,21 @@ void DelayPlugInAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, 
            mDelayReadHead += mCircularBufferLength;
         }
         
+        //linear interpolation code
+        
         int readHead_x = (int)mDelayReadHead;
         int readHead_x1 = readHead_x + 1;
+        float readHeadFloat = mDelayReadHead - readHead_x;
+
         if(readHead_x1 >= mCircularBufferLength){
             readHead_x1 -= mCircularBufferLength;
         }
-        
-        float readHeadFloat = mDelayReadHead - readHead_x;
 
         float delaySampleLeft = linearInterp(mCircularBufferLeft.at(readHead_x), mCircularBufferLeft.at(readHead_x1), readHeadFloat); //output signal
-        float delaySampleRight = linearInterp(mCircularBufferRight.at(readHead_x), mCircularBufferRight.at(readHead_x1), readHeadFloat); //output signal
+        float delaySampleRight = linearInterp(mCircularBufferRight.at(readHead_x), mCircularBufferRight.at(readHead_x1), readHeadFloat);
+
+//        float delaySampleLeft = mCircularBufferLeft[(int)mDelayReadHead]; //output signal
+//        float delaySampleRight = mCircularBufferRight[(int)mDelayReadHead]; //output signal
 
         mFeedbackLeft = delaySampleLeft * *mFeedbackParameter;
         mFeedbackRight = delaySampleRight * *mFeedbackParameter;

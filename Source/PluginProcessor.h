@@ -56,7 +56,7 @@ public:
     void getStateInformation (juce::MemoryBlock& destData) override;
     void setStateInformation (const void* data, int sizeInBytes) override;
     
-    float linearInterp(float sample_x, float sample_x1, float in_phase);
+    float linearInterp(float sample_x, float sample_x1, float in_phase); //linear interpolation method
 
 private:
     
@@ -64,13 +64,15 @@ private:
     juce::AudioParameterFloat* mFeedbackParameter;
     juce::AudioParameterFloat* mDelayTimeParameter;
     
+    float mDelayTimeSmoothed;
+    
     float mFeedbackLeft;
     float mFeedbackRight;
     
     float mDelayTimeInSamples;
-    float mDelayReadHead; //reads audio samples from circular buffer
+    float mDelayReadHead; 
     
-    int mCircularBufferWriteHead; //writes audio samples to circular buffer
+    int mCircularBufferWriteHead;
     int mCircularBufferLength;
     
     std::vector<float> mCircularBufferLeft;
